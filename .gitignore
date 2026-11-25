@@ -1,0 +1,5 @@
+# MRI images are public; download from SartajBhuvaji/Brain-Tumor-Classification-DataSet (commit 3ea9f4e)
+data/brain_mri/training/
+data/brain_mri/testing/
+*.pth
+__pycache__/

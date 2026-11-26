@@ -2,6 +2,9 @@
 
 Fork of [deepfindr/xai-series](https://github.com/deepfindr/xai-series) used for the assignment.
 
+Executed Google Colab notebook (training, evaluation and explanations, with outputs):
+https://colab.research.google.com/drive/147iGV4wDHcd5Tlggz327zFg1EB102hwb?usp=sharing
+
 ## Contents added for the assignment
 | Path | Purpose |
 |---|---|

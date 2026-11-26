@@ -6,7 +6,7 @@ Fork of [deepfindr/xai-series](https://github.com/deepfindr/xai-series) used for
 | Path | Purpose |
 |---|---|
 | `data/brain_mri/{training,testing}/` | Brain MRI images from [SartajBhuvaji/Brain-Tumor-Classification-DataSet](https://github.com/SartajBhuvaji/Brain-Tumor-Classification-DataSet), commit `3ea9f4e`, top-level folders renamed to lowercase |
-| `05_lrp.py` | Starter script (training). Step 3 of `apply_lrp_on_vgg16` was changed in the Colab run to build the one-hot output in torch (NumPy 2.x `TypeError`) |
+| `05_lrp.py` | Starter script (training). Step 3 of `apply_lrp_on_vgg16` builds the one-hot output in torch instead of a list of NumPy scalars, which raised a `TypeError` under NumPy 2.x (the only change to this file) |
 | `06_xai_brain_mri.py` | Loads the trained checkpoint, full test-set evaluation, LRP, Grad-CAM, case figures, deletion test |
 | `07_duplicate_check.py` | Readability and exact-duplicate check; writes `leaked_test_files.json` |
 | `results.txt`, `figures/` | Outputs reported in the assignment report |

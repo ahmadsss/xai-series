@@ -167,13 +167,15 @@ def apply_lrp_on_vgg16(model, image):
             activation = torch.flatten(activation, start_dim=1)
         activations[layer+1] = activation
 
-    # >>> Step 3: Replace last layer with one-hot-encoding
-    output_activation = activations[-1].detach().cpu().numpy()
-    max_activation = output_activation.max()
-    one_hot_output = [val if val == max_activation else 0 
-                        for val in output_activation[0]]
-
-    activations[-1] = torch.FloatTensor([one_hot_output]).to(device)
+    # >>> Step 3: Keep only the winning class score (one-hot of the logits)
+    # Changed for the assignment: the original list of NumPy scalars passed to
+    # torch.FloatTensor raised "TypeError: only 0-dimensional arrays can be
+    # converted to Python scalars" with NumPy 2.x. Same behaviour, built in torch.
+    logits = activations[-1].detach()
+    target = logits.argmax(dim=1)
+    one_hot = torch.zeros_like(logits)
+    one_hot[0, target] = logits[0, target]
+    activations[-1] = one_hot.to(device)
 
     # >>> Step 4: Backpropagate relevance scores
     relevances = [None] * n_layers + [activations[-1]]

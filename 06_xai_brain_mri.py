@@ -56,8 +56,9 @@ pred = torch.cat(all_pred).numpy(); true = torch.cat(all_true).numpy(); prob = t
 print("Test images evaluated:", len(true), "| accuracy: %.4f" % (pred == true).mean())
 print(classification_report(true, pred, target_names=class_names, digits=3))
 cm = confusion_matrix(true, pred)
-ConfusionMatrixDisplay(cm, display_labels=class_names).plot(xticks_rotation=30, cmap="Blues")
-plt.title("Confusion matrix (counts; rows = dataset label, columns = prediction)")
+fig, ax = plt.subplots(figsize=(7.5, 6.5))
+ConfusionMatrixDisplay(cm, display_labels=class_names).plot(ax=ax, xticks_rotation=30, cmap="Blues")
+ax.set_title(f"Confusion matrix, test set (n={len(true)}, counts)\nrows = dataset label, columns = prediction", fontsize=11)
 plt.tight_layout(); plt.savefig("figures/confusion_matrix.png", dpi=200); plt.show()
 
 # %% LRP (starter code from 05_lrp.py; changes marked CHANGED)
@@ -185,15 +186,23 @@ print(cases)
 for name, idx in cases.items():
     show_case(idx, f"figures/case_{name}.png")
 
-# %% Quantitative bonus: deletion test (remove most-relevant pixels, watch the predicted-class probability fall)
-# Masked pixels are set to 0 (black = MRI background); this introduces masking artefacts. It tests
-# faithfulness to the MODEL, not diagnostic validity.
+# %% Quantitative bonus: deletion test (remove most-relevant regions, watch the predicted-class probability fall)
+# Deletion works on 15x15 patches (255 = 17 x 15) and replaces them with a heavily blurred copy of the image.
+# Pixel-wise zeroing was tried first but created salt-and-pepper noise that the random baseline exploited
+# (out-of-distribution artefact). Tests faithfulness to the MODEL, not diagnostic validity.
+import torchvision.transforms.functional as TF
+PATCH = 15
+
 def deletion_curve(img, mapping, cls, fracs):
-    order = np.argsort(-mapping.ravel())
+    H, W = mapping.shape
+    score = F.avg_pool2d(torch.as_tensor(mapping, dtype=torch.float32)[None, None], PATCH)[0, 0]  # 17x17
+    order = torch.argsort(score.flatten(), descending=True)
+    blurred = TF.gaussian_blur(img, kernel_size=51, sigma=20.0)
     out = []
     for f in fracs:
-        m = np.ones(mapping.size, dtype=np.float32); m[order[:int(f * mapping.size)]] = 0
-        xm = img * torch.from_numpy(m.reshape(mapping.shape))[None]
+        m = torch.ones(score.numel()); m[order[:int(round(f * score.numel()))]] = 0
+        m = m.reshape(score.shape).repeat_interleave(PATCH, 0).repeat_interleave(PATCH, 1)[:H, :W]
+        xm = img * m + blurred * (1 - m)
         with torch.no_grad():
             out.append(F.softmax(model(xm[None].to(device)), 1)[0, cls].item())
     return np.array(out)
@@ -213,7 +222,7 @@ for i in sel:
 plt.figure(figsize=(6, 4))
 for k, v in res.items():
     m = np.mean(v, 0); plt.plot(fracs * 100, m, marker="o", label=f"{k} (AUC {auc(m, fracs):.3f})")
-plt.xlabel("% of pixels removed (most relevant first)"); plt.ylabel("mean probability of predicted class")
+plt.xlabel("% of image area replaced by blur (15x15 patches, most relevant first)"); plt.ylabel("mean probability of predicted class")
 plt.title(f"Deletion test, {len(sel)} correctly classified test images"); plt.legend(); plt.tight_layout()
 plt.savefig("figures/deletion_test.png", dpi=200); plt.show()
 # Lower AUC = faster drop = the map found pixels the model relies on more.

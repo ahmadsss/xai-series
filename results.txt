@@ -1,0 +1,29 @@
+Run of 06_xai_brain_mri.py on Colab, 2026-11-26, checkpoint vgg16_brain_mri_baseline.pth (513 MB)
+
+device: cuda:0 | torch 2.14.1+cu130 | torchvision 0.29.1+cu130 | numpy 2.4.6
+class_to_idx: {'glioma_tumor': 0, 'meningioma_tumor': 1, 'no_tumor': 2, 'pituitary_tumor': 3}
+train images: 2870 | test images: 394
+Test images evaluated: 394 | accuracy: 0.7919
+                  precision    recall  f1-score   support
+
+    glioma_tumor      1.000     0.240     0.387       100
+meningioma_tumor      0.691     0.991     0.814       115
+        no_tumor      0.802     1.000     0.890       105
+ pituitary_tumor      0.932     0.932     0.932        74
+
+        accuracy                          0.792       394
+       macro avg      0.856     0.791     0.756       394
+    weighted avg      0.844     0.792     0.748       394
+
+Confusion matrix (rows = label, cols = prediction; order glioma, meningioma, no_tumor, pituitary):
+[[ 24  49  22   5]
+ [  0 114   1   0]
+ [  0   0 105   0]
+ [  0   2   3  69]]
+
+Cases (test-set index):
+{'correct_glioma_tumor': 26, 'correct_meningioma_tumor': 100, 'correct_no_tumor': 215, 'correct_pituitary_tumor': 320,
+ 'error_1_glioma_tumor_as_meningioma_tumor': 0, 'error_2_glioma_tumor_as_meningioma_tumor': 1, 'error_3_glioma_tumor_as_no_tumor': 2}
+
+Deletion test v1 (pixel-wise zeroing, 30 images) - discarded as artefact-dominated:
+LRP (positive) AUC 0.249 | Grad-CAM AUC 0.183 | Random AUC 0.183

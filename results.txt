@@ -37,3 +37,8 @@ Duplicate check (07_duplicate_check.py, exact MD5 match): 3264 files, 3027 uniqu
 Test images with an identical copy in training: glioma 0/100, meningioma 0/115, no_tumor 88/105, pituitary 0/74 -> 88/394.
 All 88 leaked no_tumor images were predicted no_tumor. On the 306 non-duplicated test images: accuracy 224/306 = 0.732;
 no_tumor 17/17 correct. None of the six case images is duplicated. Near-duplicates not checked.
+
+Within-folder duplicates (07_duplicate_check.py, extra copies beyond the first, exact MD5):
+training: glioma 8, meningioma 8, no_tumor 60, pituitary 17 -> 2870 files, 2777 distinct (93 extra copies)
+testing:  glioma 16, meningioma 2, no_tumor 24, pituitary 38 -> 394 files, 314 distinct (80 extra copies)
+Distinct test images with no copy in training: glioma 84, meningioma 113, no_tumor 17, pituitary 36 -> 250.

@@ -28,4 +28,14 @@ totals = collections.Counter((c) for v in hashes.values() for s, c, _ in v if s 
 for c in sorted(totals):
     print(f"test {c}: {per_class[c]} / {totals[c]} have an identical copy in training")
 print(f"total test images with a training duplicate: {len(leak)} / {sum(totals.values())}")
+
+# Duplicates inside the same split and class folder (extra copies beyond the first) and unique images
+for split in ("training", "testing"):
+    print(f"\n{split}: class | images | unique | extra copies within this folder")
+    for c in sorted(totals):
+        files = [m for m, v in hashes.items() for s, cc, _ in v if s == split and cc == c]
+        n, u = len(files), len(set(files))
+        print(f"  {c}: {n} | {u} | {n - u}")
+    allf = [m for m, v in hashes.items() for s, _, _ in v if s == split]
+    print(f"  total: {len(allf)} | {len(set(allf))} | {len(allf) - len(set(allf))}")
 json.dump(sorted(leak), open("leaked_test_files.json", "w"), indent=0)

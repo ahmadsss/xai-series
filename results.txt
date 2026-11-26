@@ -32,3 +32,8 @@ Re-run 2026-11-26 (commit d2f7c68): accuracy, report and case indices identical 
 Deletion test v2 (15x15 patches replaced by Gaussian blur k=51 sigma=20, 30 correctly classified images, seed 2026), AUC over 0-50% area:
 LRP (positive) 0.248 | Grad-CAM 0.302 | Random 0.380   (lower = faster drop = more faithful to the model)
 Note: LRP curve minimum ~0.41 at 15-30% area, rises to 0.52 at 50%; Grad-CAM lowest beyond ~40%.
+
+Duplicate check (07_duplicate_check.py, exact MD5 match): 3264 files, 3027 unique contents, 0 unreadable, 0 label conflicts.
+Test images with an identical copy in training: glioma 0/100, meningioma 0/115, no_tumor 88/105, pituitary 0/74 -> 88/394.
+All 88 leaked no_tumor images were predicted no_tumor. On the 306 non-duplicated test images: accuracy 224/306 = 0.732;
+no_tumor 17/17 correct. None of the six case images is duplicated. Near-duplicates not checked.

@@ -168,9 +168,12 @@ def apply_lrp_on_vgg16(model, image):
         activations[layer+1] = activation
 
     # >>> Step 3: Keep only the winning class score (one-hot of the logits)
-    # Changed for the assignment: the original list of NumPy scalars passed to
+    # Changed for the assignment: the original list of NumPy values passed to
     # torch.FloatTensor raised "TypeError: only 0-dimensional arrays can be
-    # converted to Python scalars" with NumPy 2.x. Same behaviour, built in torch.
+    # converted to Python scalars" with NumPy 2.x. It also built a (1, 4) one-hot
+    # for a (1, 4, 1, 1) layer output, so broadcasting spread the relevance over
+    # all four classes. This version keeps the output's shape, so only the
+    # target class's score is propagated.
     logits = activations[-1].detach()
     target = logits.argmax(dim=1)
     one_hot = torch.zeros_like(logits)
